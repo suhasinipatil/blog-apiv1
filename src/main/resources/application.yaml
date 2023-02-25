@@ -2,8 +2,8 @@ server:
   port: 8888
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/blog
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog
     username: blog_user
     password: blog_password
   jpa:
