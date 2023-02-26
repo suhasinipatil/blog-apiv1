@@ -1,11 +1,10 @@
 package com.example.blogapi.users;
 
+import com.example.blogapi.articles.ArticleEntity;
 import com.example.blogapi.commons.BaseEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity(name = "users")
 public class UserEntity extends BaseEntity {
@@ -15,4 +14,18 @@ public class UserEntity extends BaseEntity {
     String password;
     String bio;
     String image;
+
+    @ManyToMany(mappedBy = "likedBy")
+    List<ArticleEntity> likedArticles;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_follows",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id")
+    )
+    List<UserEntity> following;
+
+    @ManyToMany(mappedBy = "following")
+    List<UserEntity> followers;
 }

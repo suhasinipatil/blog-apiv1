@@ -5,6 +5,7 @@ import com.example.blogapi.commons.BaseEntity;
 import com.example.blogapi.users.UserEntity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity(name = "articles")
 public class ArticleEntity extends BaseEntity {
@@ -19,5 +20,13 @@ public class ArticleEntity extends BaseEntity {
 
     @ManyToOne
     UserEntity author;
+
+    @ManyToMany
+    @JoinTable(
+                    name = "article_likes",
+                    joinColumns = @JoinColumn(name = "article_id"),
+                    inverseJoinColumns = @JoinColumn(name = "user_id")
+            )
+    List<UserEntity> likedBy;
 
 }
