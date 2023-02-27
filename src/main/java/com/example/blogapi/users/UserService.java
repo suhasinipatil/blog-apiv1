@@ -1,5 +1,6 @@
 package com.example.blogapi.users;
 
+import com.example.blogapi.security.jwt.JWTService;
 import com.example.blogapi.users.dto.CreateUserDTO;
 import com.example.blogapi.users.dto.LoginUserDTO;
 import com.example.blogapi.users.dto.UserResponseDTO;
@@ -13,13 +14,14 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-
     private final PasswordEncoder passwordEncoder;
+    private final JWTService jwtService;
 
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, JWTService jwtService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public UserResponseDTO createUser(CreateUserDTO createUserDTO){
@@ -31,6 +33,7 @@ public class UserService {
         newUserEntity.setPassword(passwordEncoder.encode(newUserEntity.getPassword()));
         var savedUser = userRepository.save(newUserEntity);
         var userResponseDTO = modelMapper.map(savedUser, UserResponseDTO.class);
+        userResponseDTO.setToken(jwtService.createJWT(userResponseDTO.getId()));
         return userResponseDTO;
     }
 
@@ -44,6 +47,8 @@ public class UserService {
             throw new IllegalArgumentException("Incorrect password");
         }
         var userResponseDTO = modelMapper.map(userEntity, UserResponseDTO.class);
+        userResponseDTO.setToken(jwtService.createJWT(userResponseDTO.getId()));
+
         return userResponseDTO;
     }
 
