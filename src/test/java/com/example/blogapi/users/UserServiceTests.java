@@ -1,5 +1,7 @@
 package com.example.blogapi.users;
 
+import com.example.blogapi.security.authtokens.AuthTokenRepository;
+import com.example.blogapi.security.authtokens.AuthTokenService;
 import com.example.blogapi.security.jwt.JWTService;
 import com.example.blogapi.users.dto.CreateUserDTO;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class UserServiceTests {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuthTokenRepository authTokenRepository;
     private UserService userService;
 
     private UserService getUserService(){
@@ -22,7 +27,8 @@ public class UserServiceTests {
             var modelMapper = new ModelMapper();
             var passwordEncoder = new BCryptPasswordEncoder();
             var jwtService = new JWTService();
-            userService = new UserService(userRepository, modelMapper, passwordEncoder, jwtService);
+            var authTokenService = new AuthTokenService(authTokenRepository);
+            userService = new UserService(userRepository, modelMapper, passwordEncoder, jwtService, authTokenService);
         }
         return userService;
     }

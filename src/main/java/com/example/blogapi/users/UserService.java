@@ -1,5 +1,6 @@
 package com.example.blogapi.users;
 
+import com.example.blogapi.security.authtokens.AuthTokenService;
 import com.example.blogapi.security.jwt.JWTService;
 import com.example.blogapi.users.dto.CreateUserDTO;
 import com.example.blogapi.users.dto.LoginUserDTO;
@@ -16,12 +17,14 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
+    private final AuthTokenService authTokenService;
 
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, JWTService jwtService) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, JWTService jwtService, AuthTokenService authTokenService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.authTokenService = authTokenService;
     }
 
     public UserResponseDTO createUser(CreateUserDTO createUserDTO){
@@ -37,7 +40,7 @@ public class UserService {
         return userResponseDTO;
     }
 
-    public UserResponseDTO loginUser(LoginUserDTO loginUserDTO){
+    public UserResponseDTO loginUser(LoginUserDTO loginUserDTO, AuthType authType){
         var userEntity = userRepository.findByUsername(loginUserDTO.getUsername());
         if(userEntity == null){
             throw new UserNotFoundException(loginUserDTO.getUsername());
@@ -47,7 +50,12 @@ public class UserService {
             throw new IllegalArgumentException("Incorrect password");
         }
         var userResponseDTO = modelMapper.map(userEntity, UserResponseDTO.class);
-        userResponseDTO.setToken(jwtService.createJWT(userResponseDTO.getId()));
+        switch (authType){
+            case JWT :userResponseDTO.setToken(jwtService.createJWT(userResponseDTO.getId()));
+                    break;
+            case AUTH_TOKEN : userResponseDTO.setToken(authTokenService.createAuthToken(userEntity).toString());
+                    break;
+        }
 
         return userResponseDTO;
     }
@@ -74,4 +82,8 @@ public class UserService {
         }
     }
 
+    static enum AuthType{
+        JWT,
+        AUTH_TOKEN,
+    }
 }
