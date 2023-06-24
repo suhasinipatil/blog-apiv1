@@ -15,6 +15,7 @@ public class AuthTokenEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    //Since for every client a diff token is sent so manytoone
     @ManyToOne
     private UserEntity user;
 }
