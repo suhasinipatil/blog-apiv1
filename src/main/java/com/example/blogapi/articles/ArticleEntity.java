@@ -3,11 +3,15 @@ package com.example.blogapi.articles;
 
 import com.example.blogapi.commons.BaseEntity;
 import com.example.blogapi.users.UserEntity;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity(name = "articles")
+@Getter
+@Setter
 public class ArticleEntity extends BaseEntity {
 
     @Column(unique = true, nullable = false, length = 150)

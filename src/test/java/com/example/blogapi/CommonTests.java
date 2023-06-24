@@ -1,26 +1,24 @@
-package com.example.blogapi.users;
+package com.example.blogapi;
 
 import com.example.blogapi.security.authtokens.AuthTokenRepository;
 import com.example.blogapi.security.authtokens.AuthTokenService;
 import com.example.blogapi.security.jwt.JWTService;
+import com.example.blogapi.users.UserRepository;
+import com.example.blogapi.users.UserService;
 import com.example.blogapi.users.dto.CreateUserDTO;
-import org.junit.jupiter.api.Test;
+import com.example.blogapi.users.dto.UserResponseDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+public class CommonTests {
 
-@DataJpaTest
-public class UserServiceTests {
     @Autowired
-    private UserRepository userRepository;
+    public UserRepository userRepository;
 
     @Autowired
     private AuthTokenRepository authTokenRepository;
-    private UserService userService;
+    public UserService userService;
 
     public UserService getUserService(){
         if(userService == null){
@@ -33,13 +31,5 @@ public class UserServiceTests {
         return userService;
     }
 
-    @Test
-    public void createUser(){
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setEmail("cde@gmail.com");
-        createUserDTO.setUsername("cde");
-        createUserDTO.setPassword("cde");
-        var savedUser = getUserService().createUser(createUserDTO);
-        assertNotNull(savedUser);
-    }
+
 }

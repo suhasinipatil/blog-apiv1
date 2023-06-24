@@ -82,7 +82,7 @@ public class UserService {
         }
     }
 
-    static enum AuthType{
+    public static enum AuthType{
         JWT,
         AUTH_TOKEN,
     }
