@@ -5,7 +5,6 @@ import com.example.blogapi.security.authtokens.AuthTokenService;
 import com.example.blogapi.security.jwt.JWTService;
 import com.example.blogapi.users.UserRepository;
 import com.example.blogapi.users.UserService;
-import com.example.blogapi.users.UserServiceTests;
 import com.example.blogapi.users.dto.CreateUserDTO;
 import com.example.blogapi.users.dto.UserResponseDTO;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ public class ProfileServiceTests {
         if(userService == null){
             var modelMapper = new ModelMapper();
             var passwordEncoder = new BCryptPasswordEncoder();
-            var jwtService = new JWTService();
+            var jwtService = new JWTService(globalExceptionHandler);
             var authTokenService = new AuthTokenService(authTokenRepository);
             userService = new UserService(userRepository, modelMapper, passwordEncoder, jwtService, authTokenService);
         }

@@ -1,8 +1,10 @@
 package com.example.blogapi.articles;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.example.blogapi.articles.dto.CreateArticleDTO;
 import com.example.blogapi.users.UserService;
 import com.example.blogapi.users.dto.LoginUserDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -61,5 +63,10 @@ public class ArticlesController {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(JWTDecodeException.class)
+    public ResponseEntity<String> handleJWTDecodeException(JWTDecodeException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT decoding failed: " + ex.getMessage());
     }
 }

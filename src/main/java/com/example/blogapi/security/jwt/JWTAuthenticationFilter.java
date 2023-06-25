@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.AuthenticationFilter;
 import javax.servlet.http.HttpServletRequest;
 
 public class JWTAuthenticationFilter extends AuthenticationFilter {
+
     public JWTAuthenticationFilter() {
         super(new JWTAuthenticationManager(), new JWTAuthenticationConverter());
 
@@ -40,17 +41,18 @@ public class JWTAuthenticationFilter extends AuthenticationFilter {
 
         @Override
         public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-            if(authentication instanceof JWTAuthentication){
+            if (authentication instanceof JWTAuthentication) {
                 JWTAuthentication jwtAuthentication = (JWTAuthentication) authentication;
                 String token = jwtAuthentication.getCredentials();
 
-                if(token != null){
+                if (token != null) {
                     var userId = jwtService.getUserIdFromJWT(token);
                     jwtAuthentication.setUserId(userId);
 
                     return jwtAuthentication;
                 }
             }
+
             return null;
         }
     }

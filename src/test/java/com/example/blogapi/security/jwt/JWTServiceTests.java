@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JWTServiceTests {
 
-    private  JWTService jwtService = new JWTService();
+    private  JWTService jwtService = new JWTService(globalExceptionHandler);
 
     @Test
     void canCreateJWTFromUserId(){

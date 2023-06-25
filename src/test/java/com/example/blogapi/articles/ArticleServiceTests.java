@@ -1,6 +1,5 @@
 package com.example.blogapi.articles;
 
-import com.example.blogapi.CommonTests;
 import com.example.blogapi.articles.dto.CreateArticleDTO;
 import com.example.blogapi.security.authtokens.AuthTokenRepository;
 import com.example.blogapi.security.authtokens.AuthTokenService;
@@ -39,7 +38,7 @@ public class ArticleServiceTests {
         if(userService == null){
             var modelMapper = new ModelMapper();
             var passwordEncoder = new BCryptPasswordEncoder();
-            var jwtService = new JWTService();
+            var jwtService = new JWTService(globalExceptionHandler);
             var authTokenService = new AuthTokenService(authTokenRepository);
             userService = new UserService(userRepository, modelMapper, passwordEncoder, jwtService, authTokenService);
         }

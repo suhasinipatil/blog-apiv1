@@ -4,6 +4,8 @@ import com.example.blogapi.articles.dto.CreateArticleDTO;
 import com.example.blogapi.users.UserRepository;
 import com.example.blogapi.users.UserService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.spi.MatchingStrategy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,8 +63,9 @@ public class ArticlesService {
         if(savedArticle.isPresent()){
             var article = savedArticle.get();
             if(article.getAuthor().getId() == userId){
-                var toBeSavedArticle = modelMapper.map(articleEntity, ArticleEntity.class);
-                return articlesRepository.save(toBeSavedArticle);
+                modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+                modelMapper.map(articleEntity, article);
+                return articlesRepository.save(article);
             }
             else {
                 throw new IllegalArgumentException("User not authorized to update this article");
