@@ -2,8 +2,8 @@ package com.example.blogapi.articles;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.example.blogapi.articles.dto.CreateArticleDTO;
-import com.example.blogapi.users.UserService;
-import com.example.blogapi.users.dto.LoginUserDTO;
+import com.example.blogapi.articles.dto.ResponseArticleDTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,8 +20,10 @@ public class ArticlesController {
 
     private final ArticlesService articlesService;
 
-    public ArticlesController(ArticlesService articlesService) {
+    private final ModelMapper modelMapper;
+    public ArticlesController(ArticlesService articlesService, ModelMapper modelMapper) {
         this.articlesService = articlesService;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping("")
@@ -29,8 +32,13 @@ public class ArticlesController {
     }
 
     @GetMapping("?authorName={authorName}")
-    public ResponseEntity<List<ArticleEntity>> getArticlesByAuthorName(@PathVariable String authorName){
-        return ResponseEntity.ok(articlesService.getArticlesByAuthorName(authorName));
+    public ResponseEntity<List<ResponseArticleDTO>> getArticlesByAuthorName(@PathVariable String authorName){
+        List<ArticleEntity> articleEntities = articlesService.getArticlesByAuthorName(authorName);
+        List<ResponseArticleDTO> responseArticleDTOList = new ArrayList<>();
+        for(ArticleEntity article: articleEntities){
+            responseArticleDTOList.add(modelMapper.map(article, ResponseArticleDTO.class));
+        }
+        return ResponseEntity.ok(responseArticleDTOList);
     }
 
     @GetMapping("/private")
@@ -39,25 +47,29 @@ public class ArticlesController {
     }
 
     @PostMapping("")
-    public ResponseEntity<ArticleEntity> createArticle(@RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId) throws URISyntaxException {
+    public ResponseEntity<ResponseArticleDTO> createArticle(@RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId) throws URISyntaxException {
         if(userId == null){
             throw new IllegalArgumentException("User not logged in");
         }
         var savedArticle = articlesService.createArticle(articleEntity, userId);
-        return ResponseEntity.created(new URI("/articles/" + savedArticle.getId())).body(savedArticle);
+        var savedResponseArticle = modelMapper.map(savedArticle, ResponseArticleDTO.class);
+        return ResponseEntity.created(new URI("/articles/" + savedArticle.getId())).body(savedResponseArticle);
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<ArticleEntity> getArticleBySlug(@PathVariable String slug){
-        return ResponseEntity.ok(articlesService.getArticleBySlug(slug));
+    public ResponseEntity<ResponseArticleDTO> getArticleBySlug(@PathVariable String slug){
+        ArticleEntity article = articlesService.getArticleBySlug(slug);
+        var savedArticle = modelMapper.map(article, ResponseArticleDTO.class);
+        return ResponseEntity.ok(savedArticle);
     }
 
     @PatchMapping("/{slug}")
-    public ResponseEntity<ArticleEntity> updateArticle(@PathVariable String slug, @RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId){
+    public ResponseEntity<ResponseArticleDTO> updateArticle(@PathVariable String slug, @RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId){
         if(userId == null){
             throw new IllegalArgumentException("User not logged in");
         }
-        return ResponseEntity.ok(articlesService.updateArticle(slug, articleEntity, userId));
+        var updatedArticle = articlesService.updateArticle(slug, articleEntity, userId);
+        return ResponseEntity.ok(modelMapper.map(updatedArticle, ResponseArticleDTO.class));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

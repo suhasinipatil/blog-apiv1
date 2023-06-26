@@ -1,13 +1,14 @@
 package com.example.blogapi.articles;
 
 import com.example.blogapi.articles.dto.CreateArticleDTO;
+import com.example.blogapi.articles.dto.ResponseArticleDTO;
 import com.example.blogapi.users.UserRepository;
 import com.example.blogapi.users.UserService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.spi.MatchingStrategy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,12 +42,13 @@ public class ArticlesService {
 
     public List<ArticleEntity> getArticlesByAuthorName(String authorName){
         var userEntity = UserRepository.findByUsername(authorName);
-        Optional<ArticleEntity> lsOfArticleEntity = articlesRepository.findByAuthorId(userEntity.getId());
+        Optional<List<ArticleEntity>> lsOfArticleEntity = articlesRepository.findByAuthorId(userEntity.getId());
         if(lsOfArticleEntity.isPresent()){
-            return lsOfArticleEntity.stream().toList();
+            return lsOfArticleEntity.get().stream().toList();
         }
-        else
-            return null;
+        else{
+            throw new IllegalArgumentException("No Articles found");
+        }
     }
 
     public ArticleEntity getArticleBySlug(String slug){

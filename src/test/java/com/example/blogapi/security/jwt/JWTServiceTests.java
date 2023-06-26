@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JWTServiceTests {
 
-    private  JWTService jwtService = new JWTService(globalExceptionHandler);
+    private  JWTService jwtService = new JWTService();
 
     @Test
     void canCreateJWTFromUserId(){
@@ -19,7 +19,7 @@ public class JWTServiceTests {
 
     @Test
     void canVerifyJWT(){
-        var jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyaWQiOiIxMTIyIiwiaWF0IjoxNTk3ODk1MTY4LCJleHAiOjIwOTk5OTk5OTh9.oOQjt5e06GQYt-sYY6AUzrv74B1Q3mKFAuyhCILDnT0";
+        var jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyaWQiOiIxMTIyIiwiaWF0IjoxNTk3ODk1MTY4LCJleHAiOjIwOTk5OTk5OTgsInN1YmplY3QiOiJIaSJ9.P1AHiRcn3PzrRJiBKNSayKwfJHwy30Nq0Yo_P3d56HA";
         var userId = jwtService.getUserIdFromJWT(jwt);
         assertEquals(1122, userId);
     }

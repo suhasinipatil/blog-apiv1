@@ -5,13 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 @Repository
 public interface ArticlesRepository extends JpaRepository<ArticleEntity, Integer> {
 
-    Optional<ArticleEntity> findByAuthorId(Integer authorId);
+    Optional<List<ArticleEntity>> findByAuthorId(Integer authorId);
 
     Optional<ArticleEntity> findBySlug(String slug);
 }

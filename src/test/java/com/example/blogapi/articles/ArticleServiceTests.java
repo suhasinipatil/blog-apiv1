@@ -38,7 +38,7 @@ public class ArticleServiceTests {
         if(userService == null){
             var modelMapper = new ModelMapper();
             var passwordEncoder = new BCryptPasswordEncoder();
-            var jwtService = new JWTService(globalExceptionHandler);
+            var jwtService = new JWTService();
             var authTokenService = new AuthTokenService(authTokenRepository);
             userService = new UserService(userRepository, modelMapper, passwordEncoder, jwtService, authTokenService);
         }

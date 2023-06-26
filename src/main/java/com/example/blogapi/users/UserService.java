@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -58,6 +59,15 @@ public class UserService {
         }
 
         return userResponseDTO;
+    }
+
+    public UserEntity findById(Integer userId){
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if(userEntity.isPresent()){
+            return userEntity.get();
+        }else {
+            throw new UserNotFoundException(userId);
+        }
     }
 
     public static class UserNotFoundException extends IllegalArgumentException{
