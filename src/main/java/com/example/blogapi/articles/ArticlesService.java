@@ -56,8 +56,9 @@ public class ArticlesService {
         if(articleEntity.isPresent()){
             return articleEntity.get();
         }
-        else
-            return null;
+        else{
+            throw new IllegalArgumentException("Article not found for the slug");
+        }
     }
 
     public ArticleEntity updateArticle(String slug, CreateArticleDTO articleEntity, Integer userId){

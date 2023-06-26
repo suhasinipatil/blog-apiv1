@@ -100,11 +100,11 @@ public class CommentServiceTests {
     }
 
     @Test
-    public void getComments(){
+    public void getCommentsBySlug(){
         UserResponseDTO userResponseDTO = createUser();
         ArticleEntity savedArticle = createArticledto(userResponseDTO.getId());
         var savedComment = getCommentService().createComment(createCommentDTO(), savedArticle.getSlug(), userResponseDTO.getId());
-        List<ResponseCommentDTO> responseCommentDTOList = getCommentService().getAllComments();
+        List<ResponseCommentDTO> responseCommentDTOList = getCommentService().getAllComments(savedArticle.getSlug());
         assertNotNull(responseCommentDTOList);
         assertEquals(1, responseCommentDTOList.size());
     }

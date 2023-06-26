@@ -28,10 +28,10 @@ public class CommentService {
         this.articlesService = articlesService;
     }
 
-    public List<ResponseCommentDTO> getAllComments(){
-        List<CommentEntity> commentEntityList = commentRepository.findAll();
+    public List<ResponseCommentDTO> getAllComments(String slug){
+        Optional<List<CommentEntity>> commentEntityList = commentRepository.findBySlug(slug);
         List<ResponseCommentDTO> responseCommentDTOList = new ArrayList<>();
-        for(CommentEntity commentEntity: commentEntityList){
+        for(CommentEntity commentEntity: commentEntityList.get()){
             responseCommentDTOList.add(modelMapper.map(commentEntity, ResponseCommentDTO.class));
         }
         return responseCommentDTOList;

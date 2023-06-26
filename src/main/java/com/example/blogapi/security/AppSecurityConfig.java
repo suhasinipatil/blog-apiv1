@@ -29,6 +29,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/profiles/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/articles/**").permitAll()
                 .antMatchers(HttpMethod.PATCH, "/articles/**").permitAll()
+                .antMatchers(HttpMethod.DELETE,"/articles/**" ).permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(new JWTAuthenticationFilter(), AnonymousAuthenticationFilter.class);
         http.addFilterBefore(new AuthTokenAuthenticationFilter(authTokenService), AnonymousAuthenticationFilter.class);

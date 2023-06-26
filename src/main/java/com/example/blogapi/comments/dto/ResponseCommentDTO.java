@@ -8,6 +8,7 @@ import lombok.Setter;
 public class ResponseCommentDTO {
     String title;
     String body;
+    Integer Id;
     Integer articleId;
     Integer authorId;
 }
