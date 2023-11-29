@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @EnableWebSecurity
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -21,9 +22,10 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().cors().disable();
+        http.csrf().disable().cors();
 
         http.authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/users").permitAll()
                 .antMatchers(HttpMethod.POST, "/users/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/articles/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/profiles/**").permitAll()
@@ -36,4 +38,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         //To make sure the server is stateless
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
+
+
 }

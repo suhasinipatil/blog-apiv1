@@ -1,8 +1,10 @@
 package com.example.blogapi.users;
 
+import com.example.blogapi.commons.dto.ErrorMessage;
 import com.example.blogapi.users.dto.CreateUserDTO;
 import com.example.blogapi.users.dto.LoginUserDTO;
 import com.example.blogapi.users.dto.UserResponseDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +17,7 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     private final UserService userService;
 
@@ -37,30 +40,17 @@ public class UserController {
             authType = UserService.AuthType.AUTH_TOKEN;
         }
         var savedUser = userService.loginUser(loginUserDTO, authType);
-        printAuthenticatedUser();
         return ResponseEntity.ok(savedUser);
-    }
-
-    public void printAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            // Print the authenticated user's details
-            System.out.println("Username: " + userDetails.getUsername());
-            System.out.println("Authorities: " + userDetails.getAuthorities());
-
-            // Access any other available information from the UserDetails object
-            // ...
-        } else {
-            System.out.println("User not authenticated");
-        }
     }
 
     @ExceptionHandler(UserService.UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFoundException(UserService.UserNotFoundException ex){
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(UserService.UserAlreadyExitsException.class)
+    public ResponseEntity<String> handleAlreadyExitsException(UserService.UserAlreadyExitsException ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User already exists");
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

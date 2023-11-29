@@ -2,6 +2,10 @@ package com.example.blogapi.articles;
 
 import com.example.blogapi.articles.dto.CreateArticleDTO;
 import com.example.blogapi.articles.dto.ResponseArticleDTO;
+import com.example.blogapi.comments.CommentEntity;
+import com.example.blogapi.comments.CommentRepository;
+import com.example.blogapi.comments.CommentService;
+import com.example.blogapi.comments.dto.ResponseCommentDTO;
 import com.example.blogapi.users.UserRepository;
 import com.example.blogapi.users.UserService;
 import org.modelmapper.ModelMapper;
@@ -17,17 +21,33 @@ public class ArticlesService {
     private final ArticlesRepository articlesRepository;
 
     private final UserRepository UserRepository;
+
+    private final CommentService commentService;
     private final ModelMapper modelMapper;
-    private final UserService userService;
-    public ArticlesService(ArticlesRepository articlesRepository, UserRepository userRepository, ModelMapper modelMapper, UserService userService) {
+
+    public ArticlesService(ArticlesRepository articlesRepository, UserRepository userRepository, CommentService commentService, ModelMapper modelMapper) {
         this.articlesRepository = articlesRepository;
         this.UserRepository = userRepository;
+        this.commentService = commentService;
         this.modelMapper = modelMapper;
-        this.userService = userService;
     }
 
-    public List<ArticleEntity> getAllArticles() {
-        return articlesRepository.findAll();
+    public List<ResponseArticleDTO> getAllArticlesWithComments() {
+        List<ArticleEntity> articleEntities = articlesRepository.findAll();
+        List<ResponseArticleDTO> articleDTOList = new ArrayList<>();
+
+        for(ArticleEntity articleEntity: articleEntities){
+            ResponseArticleDTO responseArticleDTO = modelMapper.map(articleEntity, ResponseArticleDTO.class);
+            responseArticleDTO.setAuthor(articleEntity.getAuthor().getUsername());
+            List<ResponseCommentDTO> responseCommentDTOList = new ArrayList<>();
+            for(CommentEntity commentEntity: articleEntity.getCommentEntityList()){
+                ResponseCommentDTO responseCommentDTO = modelMapper.map(commentEntity, ResponseCommentDTO.class);
+                responseCommentDTOList.add(responseCommentDTO);
+            }
+            responseArticleDTO.setCommentEntities(responseCommentDTOList);
+            articleDTOList.add(responseArticleDTO);
+        }
+        return articleDTOList;
     }
 
     public ArticleEntity createArticle(CreateArticleDTO articleEntity, Integer userId) {

@@ -1,6 +1,7 @@
 package com.example.blogapi.comments;
 
 import com.example.blogapi.articles.ArticleEntity;
+import com.example.blogapi.articles.ArticlesRepository;
 import com.example.blogapi.articles.ArticlesService;
 import com.example.blogapi.comments.dto.CreateCommentDTO;
 import com.example.blogapi.comments.dto.ResponseCommentDTO;
@@ -17,33 +18,40 @@ import java.util.Optional;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+
     private final ModelMapper modelMapper;
     private final UserService userService;
-    private final ArticlesService articlesService;
 
-    public CommentService(CommentRepository commentRepository, ModelMapper modelMapper, UserService userService, ArticlesService articlesService) {
+    //private final ArticlesService articlesService;
+    private final ArticlesRepository articlesRepository;
+    public CommentService(CommentRepository commentRepository, ModelMapper modelMapper, UserService userService/*, ArticlesService articlesService*/, ArticlesRepository articlesRepository) {
         this.commentRepository = commentRepository;
         this.modelMapper = modelMapper;
         this.userService = userService;
-        this.articlesService = articlesService;
+       // this.articlesService = articlesService;
+        this.articlesRepository = articlesRepository;
     }
 
     public List<ResponseCommentDTO> getAllComments(String slug){
-        Optional<List<CommentEntity>> commentEntityList = commentRepository.findBySlug(slug);
+        //ArticleEntity article = articlesService.getArticleBySlug(slug);
         List<ResponseCommentDTO> responseCommentDTOList = new ArrayList<>();
-        for(CommentEntity commentEntity: commentEntityList.get()){
+       /* for(CommentEntity commentEntity: article.getCommentEntityList()){
             responseCommentDTOList.add(modelMapper.map(commentEntity, ResponseCommentDTO.class));
-        }
+        }*/
         return responseCommentDTOList;
     }
 
-    public CommentEntity createComment(CreateCommentDTO createCommentDTO, String slug, Integer userId){
-        ArticleEntity article = articlesService.getArticleBySlug(slug);
+    public CommentEntity createComment(CreateCommentDTO createCommentDTO, ArticleEntity article, Integer userId ){
         var commentEntity = modelMapper.map(createCommentDTO, CommentEntity.class);
         UserEntity userEntity = userService.findById(userId);
-        commentEntity.setArticleEntity(article);
         commentEntity.setAuthor(userEntity);
         var savedCommentEntity = commentRepository.save(commentEntity);
+        List<CommentEntity> commentEntityList = article.getCommentEntityList();
+        if(commentEntityList == null)
+            commentEntityList = new ArrayList<>();
+        commentEntityList.add(savedCommentEntity);
+        article.setCommentEntityList(commentEntityList);
+        articlesRepository.save(article);
         return savedCommentEntity;
     }
 
@@ -62,4 +70,5 @@ public class CommentService {
             throw new IllegalArgumentException("Comment not present");
         }
     }
+
 }

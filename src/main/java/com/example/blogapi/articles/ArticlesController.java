@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/articles")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ArticlesController {
 
     private final ArticlesService articlesService;
@@ -27,8 +28,8 @@ public class ArticlesController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<ArticleEntity>> getArticles(){
-        return ResponseEntity.ok(articlesService.getAllArticles());
+    public ResponseEntity<List<ResponseArticleDTO>> getArticles(){
+        return ResponseEntity.ok(articlesService.getAllArticlesWithComments());
     }
 
     @GetMapping("?authorName={authorName}")
@@ -53,6 +54,7 @@ public class ArticlesController {
         }
         var savedArticle = articlesService.createArticle(articleEntity, userId);
         var savedResponseArticle = modelMapper.map(savedArticle, ResponseArticleDTO.class);
+        savedResponseArticle.setAuthor(savedArticle.getAuthor().getUsername());
         return ResponseEntity.created(new URI("/articles/" + savedArticle.getId())).body(savedResponseArticle);
     }
 

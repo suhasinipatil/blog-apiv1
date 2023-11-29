@@ -1,6 +1,10 @@
 package com.example.blogapi.articles;
 
 import com.example.blogapi.articles.dto.CreateArticleDTO;
+import com.example.blogapi.comments.CommentEntity;
+import com.example.blogapi.comments.CommentRepository;
+import com.example.blogapi.comments.CommentService;
+import com.example.blogapi.comments.dto.CreateCommentDTO;
 import com.example.blogapi.security.authtokens.AuthTokenRepository;
 import com.example.blogapi.security.authtokens.AuthTokenService;
 import com.example.blogapi.security.jwt.JWTService;
@@ -24,12 +28,15 @@ public class ArticleServiceTests {
     private ArticlesRepository articlesRepository;
     @Autowired
     private AuthTokenRepository authTokenRepository;
+    @Autowired
+    private CommentRepository commentRepository;
     private ArticlesService articlesService;
     private UserService userService;
+    private CommentService commentService;
     private ArticlesService getArticlesService(){
         if(articlesService == null){
            var modelMapper = new ModelMapper();
-           articlesService = new ArticlesService(articlesRepository, userRepository, modelMapper, getUserService());
+           articlesService = new ArticlesService(articlesRepository, userRepository, commentService, modelMapper);
         }
         return articlesService;
     }
@@ -62,6 +69,25 @@ public class ArticleServiceTests {
         return createArticleDTO;
     }
 
+    private CreateCommentDTO createCommentDTO(){
+        CreateCommentDTO createCommentDTO = new CreateCommentDTO();
+        createCommentDTO.setBody("cde");
+        createCommentDTO.setTitle("cde");
+        return createCommentDTO;
+    }
+
+    private CommentService getCommentService(){
+        if(commentService == null){
+            var modelMapper = new ModelMapper();
+            commentService = new CommentService(commentRepository, modelMapper, getUserService(), articlesRepository);
+        }
+        return commentService;
+    }
+
+    public CommentEntity createComment(ArticleEntity savedArticle, UserResponseDTO userResponseDTO){
+        return getCommentService().createComment(createCommentDTO(), savedArticle, userResponseDTO.getId());
+    }
+
     @Test
     public void createArticle(){
         var userResponseDTO = createUser();
@@ -75,7 +101,8 @@ public class ArticleServiceTests {
         var userResponseDTO = createUser();
         var createArticleDTO = createArticledto();
         var savedArticle = getArticlesService().createArticle(createArticleDTO, userResponseDTO.getId());
-        var article = getArticlesService().getAllArticles();
+        var commentCreated = createComment(savedArticle, userResponseDTO);
+        var article = getArticlesService().getAllArticlesWithComments();
         assertNotNull(article);
         assertEquals(article.size(), 1);
     }

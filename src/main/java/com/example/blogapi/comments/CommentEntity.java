@@ -23,6 +23,6 @@ public class CommentEntity extends BaseEntity {
     @ManyToOne
     UserEntity author;
 
-    @ManyToOne
-    ArticleEntity articleEntity;
+   /* @ManyToOne
+    ArticleEntity articleEntity;*/
 }

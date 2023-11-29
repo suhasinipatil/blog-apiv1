@@ -1,6 +1,7 @@
 package com.example.blogapi.articles;
 
 
+import com.example.blogapi.comments.CommentEntity;
 import com.example.blogapi.commons.BaseEntity;
 import com.example.blogapi.users.UserEntity;
 import lombok.Getter;
@@ -32,5 +33,8 @@ public class ArticleEntity extends BaseEntity {
                     inverseJoinColumns = @JoinColumn(name = "user_id")
             )
     List<UserEntity> likedBy;
+
+    @OneToMany
+    List<CommentEntity> commentEntityList;
 
 }

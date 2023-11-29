@@ -42,7 +42,7 @@ public class CommentServiceTests {
     private CommentService getCommentService(){
         if(commentService == null){
             var modelMapper = new ModelMapper();
-            commentService = new CommentService(commentRepository, modelMapper, getUserService(), getArticlesService());
+            commentService = new CommentService(commentRepository, modelMapper, getUserService(), articlesRepository);
         }
         return commentService;
     }
@@ -50,7 +50,7 @@ public class CommentServiceTests {
     private ArticlesService getArticlesService(){
         if(articlesService == null){
             var modelMapper = new ModelMapper();
-            articlesService = new ArticlesService(articlesRepository, userRepository, modelMapper, getUserService());
+            articlesService = new ArticlesService(articlesRepository, userRepository, commentService, modelMapper);
         }
         return articlesService;
     }
@@ -95,7 +95,7 @@ public class CommentServiceTests {
     public void createComment(){
         UserResponseDTO userResponseDTO = createUser();
         ArticleEntity savedArticle = createArticledto(userResponseDTO.getId());
-        var savedComment = getCommentService().createComment(createCommentDTO(), savedArticle.getSlug(), userResponseDTO.getId());
+        var savedComment = getCommentService().createComment(createCommentDTO(), savedArticle, userResponseDTO.getId());
         assertNotNull(savedComment);
     }
 
@@ -103,7 +103,7 @@ public class CommentServiceTests {
     public void getCommentsBySlug(){
         UserResponseDTO userResponseDTO = createUser();
         ArticleEntity savedArticle = createArticledto(userResponseDTO.getId());
-        var savedComment = getCommentService().createComment(createCommentDTO(), savedArticle.getSlug(), userResponseDTO.getId());
+        var savedComment = getCommentService().createComment(createCommentDTO(), savedArticle, userResponseDTO.getId());
         List<ResponseCommentDTO> responseCommentDTOList = getCommentService().getAllComments(savedArticle.getSlug());
         assertNotNull(responseCommentDTOList);
         assertEquals(1, responseCommentDTOList.size());
@@ -113,7 +113,7 @@ public class CommentServiceTests {
     public void deleteComment(){
         UserResponseDTO userResponseDTO = createUser();
         ArticleEntity savedArticle = createArticledto(userResponseDTO.getId());
-        var savedComment = getCommentService().createComment(createCommentDTO(), savedArticle.getSlug(), userResponseDTO.getId());
+        var savedComment = getCommentService().createComment(createCommentDTO(), savedArticle, userResponseDTO.getId());
         ResponseCommentDTO deleteComment = getCommentService().deleteComment(savedComment.getId(), userResponseDTO.getId());
         assertNotNull(deleteComment);
 

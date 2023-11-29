@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, Integer> {
 
-    @Query("select cm from comments cm join articles ar on cm.articleEntity.id = ar.id")
-    Optional<List<CommentEntity>> findBySlug(String slug);
+   /* @Query("select cm from comments cm join articles ar on cm.articleEntity.id = ar.id")
+    Optional<List<CommentEntity>> findBySlug(String slug);*/
 
 }
