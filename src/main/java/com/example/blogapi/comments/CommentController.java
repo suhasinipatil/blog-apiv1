@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/articles/{articleSlug}/comments")
+@RequestMapping("/articles/{articleId}/comments")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CommentController {
 
@@ -37,11 +37,11 @@ public class CommentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<ResponseCommentDTO> createComment(@RequestBody CreateCommentDTO createCommentDTO, @PathVariable String articleSlug, @AuthenticationPrincipal Integer userId) throws URISyntaxException {
+    public ResponseEntity<ResponseCommentDTO> createComment(@RequestBody CreateCommentDTO createCommentDTO, @PathVariable Integer articleId, @AuthenticationPrincipal Integer userId) throws URISyntaxException {
         if(userId == null){
             throw new IllegalArgumentException("User not logged in");
         }
-        ArticleEntity article = articlesService.getArticleBySlug(articleSlug);
+        ArticleEntity article = articlesService.getArticleById(articleId);
         CommentEntity savedComment = commentService.createComment(createCommentDTO, article, userId);
         var responseCommentDTO = modelMapper.map(savedComment, ResponseCommentDTO.class);
         return ResponseEntity.created(new URI("/comments/" + savedComment.getId())).body(responseCommentDTO);

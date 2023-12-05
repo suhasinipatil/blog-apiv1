@@ -141,7 +141,7 @@ public class ArticleServiceTests {
         var createArticleDTO = createArticledto();
         var savedArticle = getArticlesService().createArticle(createArticleDTO, userResponseDTO.getId());
         createArticleDTO.setTitle("abc");
-        var article = getArticlesService().updateArticle(savedArticle.getSlug(), createArticleDTO, userResponseDTO.getId());
+        var article = getArticlesService().updateArticle(savedArticle.getId(), createArticleDTO, userResponseDTO.getId());
         assertNotNull(article);
         assertEquals(article.getTitle(), createArticleDTO.getTitle());
     }
@@ -153,7 +153,7 @@ public class ArticleServiceTests {
         var savedArticle = getArticlesService().createArticle(createArticleDTO, userResponseDTO.getId());
         createArticleDTO.setTitle("abc");
         assertThrowsExactly(IllegalArgumentException.class, () -> {
-            getArticlesService().updateArticle(savedArticle.getSlug(), createArticleDTO, 0);
+            getArticlesService().updateArticle(savedArticle.getId(), createArticleDTO, 0);
         });
     }
 }

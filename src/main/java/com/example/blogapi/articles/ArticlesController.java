@@ -55,22 +55,23 @@ public class ArticlesController {
         var savedArticle = articlesService.createArticle(articleEntity, userId);
         var savedResponseArticle = modelMapper.map(savedArticle, ResponseArticleDTO.class);
         savedResponseArticle.setAuthor(savedArticle.getAuthor().getUsername());
+        savedResponseArticle.setAuthorId(savedArticle.getAuthor().getId());
         return ResponseEntity.created(new URI("/articles/" + savedArticle.getId())).body(savedResponseArticle);
     }
 
-    @GetMapping("/{slug}")
-    public ResponseEntity<ResponseArticleDTO> getArticleBySlug(@PathVariable String slug){
-        ArticleEntity article = articlesService.getArticleBySlug(slug);
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseArticleDTO> getArticleBySlug(@PathVariable Integer id){
+        ArticleEntity article = articlesService.getArticleById(id);
         var savedArticle = modelMapper.map(article, ResponseArticleDTO.class);
         return ResponseEntity.ok(savedArticle);
     }
 
-    @PatchMapping("/{slug}")
-    public ResponseEntity<ResponseArticleDTO> updateArticle(@PathVariable String slug, @RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId){
+    @PatchMapping("/{id}")
+    public ResponseEntity<ResponseArticleDTO> updateArticle(@PathVariable Integer id, @RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId){
         if(userId == null){
             throw new IllegalArgumentException("User not logged in");
         }
-        var updatedArticle = articlesService.updateArticle(slug, articleEntity, userId);
+        var updatedArticle = articlesService.updateArticle(id, articleEntity, userId);
         return ResponseEntity.ok(modelMapper.map(updatedArticle, ResponseArticleDTO.class));
     }
 

@@ -9,10 +9,12 @@ import java.util.List;
 @Getter
 @Setter
 public class ResponseArticleDTO {
+    Integer id;
     String slug;
     String title;
     String subtitle;
     String body;
     String author;
+    Integer authorId;
     List<ResponseCommentDTO> commentEntities;
 }

@@ -81,8 +81,18 @@ public class ArticlesService {
         }
     }
 
-    public ArticleEntity updateArticle(String slug, CreateArticleDTO articleEntity, Integer userId){
-        var savedArticle = articlesRepository.findBySlug(slug);
+    public ArticleEntity getArticleById(Integer id){
+        var articleEntity = articlesRepository.findById(id);
+        if(articleEntity.isPresent()){
+            return articleEntity.get();
+        }
+        else{
+            throw new IllegalArgumentException("Article not found for the slug");
+        }
+    }
+
+    public ArticleEntity updateArticle(Integer id, CreateArticleDTO articleEntity, Integer userId){
+        var savedArticle = articlesRepository.findById(id);
         if(savedArticle.isPresent()){
             var article = savedArticle.get();
             if(article.getAuthor().getId() == userId){
