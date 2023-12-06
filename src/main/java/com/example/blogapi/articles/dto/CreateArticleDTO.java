@@ -6,8 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateArticleDTO {
-    String slug;
     String title;
-    String subtitle;
     String body;
 }

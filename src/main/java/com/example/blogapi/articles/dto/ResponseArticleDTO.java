@@ -10,9 +10,7 @@ import java.util.List;
 @Setter
 public class ResponseArticleDTO {
     Integer id;
-    String slug;
     String title;
-    String subtitle;
     String body;
     String author;
     Integer authorId;

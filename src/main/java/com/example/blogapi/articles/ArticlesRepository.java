@@ -15,7 +15,4 @@ public interface ArticlesRepository extends JpaRepository<ArticleEntity, Integer
 
     Optional<List<ArticleEntity>> findByAuthorId(Integer authorId);
 
-    Optional<ArticleEntity> findBySlug(String slug);
-
-
 }

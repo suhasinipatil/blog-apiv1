@@ -65,7 +65,6 @@ public class ArticleServiceTests {
         CreateArticleDTO createArticleDTO = new CreateArticleDTO();
         createArticleDTO.setTitle("cde");
         createArticleDTO.setBody("cde");
-        createArticleDTO.setSlug("cde");
         return createArticleDTO;
     }
 
@@ -126,13 +125,13 @@ public class ArticleServiceTests {
     }
 
     @Test
-    public void getArticleBySlug(){
+    public void getArticleById(){
         var userResponseDTO = createUser();
         var createArticleDTO = createArticledto();
         var savedArticle = getArticlesService().createArticle(createArticleDTO, userResponseDTO.getId());
-        var article = getArticlesService().getArticleBySlug(savedArticle.getSlug());
+        var article = getArticlesService().getArticleById(savedArticle.getId());
         assertNotNull(article);
-        assertEquals(article.getSlug(), savedArticle.getSlug());
+        assertEquals(article.getId(), savedArticle.getId());
     }
 
     @Test

@@ -39,6 +39,7 @@ public class ArticlesService {
         for(ArticleEntity articleEntity: articleEntities){
             ResponseArticleDTO responseArticleDTO = modelMapper.map(articleEntity, ResponseArticleDTO.class);
             responseArticleDTO.setAuthor(articleEntity.getAuthor().getUsername());
+            responseArticleDTO.setAuthorId(articleEntity.getAuthor().getId());
             List<ResponseCommentDTO> responseCommentDTOList = new ArrayList<>();
             for(CommentEntity commentEntity: articleEntity.getCommentEntityList()){
                 ResponseCommentDTO responseCommentDTO = modelMapper.map(commentEntity, ResponseCommentDTO.class);
@@ -71,23 +72,13 @@ public class ArticlesService {
         }
     }
 
-    public ArticleEntity getArticleBySlug(String slug){
-        var articleEntity = articlesRepository.findBySlug(slug);
-        if(articleEntity.isPresent()){
-            return articleEntity.get();
-        }
-        else{
-            throw new IllegalArgumentException("Article not found for the slug");
-        }
-    }
-
     public ArticleEntity getArticleById(Integer id){
         var articleEntity = articlesRepository.findById(id);
         if(articleEntity.isPresent()){
             return articleEntity.get();
         }
         else{
-            throw new IllegalArgumentException("Article not found for the slug");
+            throw new IllegalArgumentException("Article not found for the id");
         }
     }
 

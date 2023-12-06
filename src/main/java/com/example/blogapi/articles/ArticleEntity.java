@@ -15,11 +15,8 @@ import java.util.List;
 @Setter
 public class ArticleEntity extends BaseEntity {
 
-    @Column(unique = true, nullable = false, length = 150)
-    String slug;
     @Column(nullable = false, length = 200)
     String title;
-    String subtitle;
     @Column(nullable = false, length = 8000)
     String body;
 
