@@ -32,8 +32,6 @@ public class CommentRepositoryTests {
         articleEntity.setAuthor(userEntity);
         articleEntity.setTitle("cde");
         articleEntity.setBody("cde");
-        articleEntity.setSlug("cde");
-        articleEntity.setSubtitle("cde");
         articlesRepository.save(articleEntity);
 
         CommentEntity commentEntity = new CommentEntity();

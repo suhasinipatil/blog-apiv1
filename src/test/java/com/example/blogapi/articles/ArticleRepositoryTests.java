@@ -29,7 +29,6 @@ public class ArticleRepositoryTests {
         articleEntity.setAuthor(userEntity);
         articleEntity.setTitle("cde");
         articleEntity.setBody("cde");
-        articleEntity.setSlug("cde");
         articlesRepository.save(articleEntity);
 
         var article = articlesRepository.findByAuthorId(1);

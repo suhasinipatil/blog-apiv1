@@ -11,6 +11,8 @@ import com.example.blogapi.users.UserService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,11 @@ public class ArticlesService {
 
     public List<ResponseArticleDTO> getAllArticlesWithComments() {
         List<ArticleEntity> articleEntities = articlesRepository.findAll();
+        // Sort the articles in descending order of creation date
+        articleEntities = articleEntities.stream()
+                .sorted(Comparator.comparing(ArticleEntity::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+
         List<ResponseArticleDTO> articleDTOList = new ArrayList<>();
 
         for(ArticleEntity articleEntity: articleEntities){
