@@ -3,6 +3,8 @@ package com.example.blogapi.articles;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.example.blogapi.articles.dto.CreateArticleDTO;
 import com.example.blogapi.articles.dto.ResponseArticleDTO;
+import com.example.blogapi.comments.CommentEntity;
+import com.example.blogapi.comments.dto.ResponseCommentDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +65,15 @@ public class ArticlesController {
     public ResponseEntity<ResponseArticleDTO> getArticleBySlug(@PathVariable Integer id){
         ArticleEntity article = articlesService.getArticleById(id);
         var savedArticle = modelMapper.map(article, ResponseArticleDTO.class);
+        savedArticle.setAuthor(article.getAuthor().getUsername());
+        savedArticle.setAuthorId(article.getAuthor().getId());
+
+        List<ResponseCommentDTO> responseCommentDTOList = new ArrayList<>();
+        for(CommentEntity commentEntity: article.getCommentEntityList()){
+            ResponseCommentDTO responseCommentDTO = modelMapper.map(commentEntity, ResponseCommentDTO.class);
+            responseCommentDTOList.add(responseCommentDTO);
+        }
+        savedArticle.setCommentEntities(responseCommentDTOList);
         return ResponseEntity.ok(savedArticle);
     }
 
