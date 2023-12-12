@@ -14,15 +14,9 @@ import javax.persistence.ManyToOne;
 @Getter
 @Setter
 public class CommentEntity extends BaseEntity {
-    @Column(nullable = false, length = 100)
-    String title;
-
     @Column(length = 1000)
     String body;
 
     @ManyToOne
     UserEntity author;
-
-   /* @ManyToOne
-    ArticleEntity articleEntity;*/
 }
