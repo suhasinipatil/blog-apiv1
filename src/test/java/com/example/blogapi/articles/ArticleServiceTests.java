@@ -78,7 +78,7 @@ public class ArticleServiceTests {
     private CommentService getCommentService(){
         if(commentService == null){
             var modelMapper = new ModelMapper();
-            commentService = new CommentService(commentRepository, modelMapper, getUserService(), articlesRepository);
+            commentService = new CommentService(commentRepository, modelMapper, getUserService(), getArticlesService(),articlesRepository);
         }
         return commentService;
     }

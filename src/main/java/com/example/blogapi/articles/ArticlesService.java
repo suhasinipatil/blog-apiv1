@@ -104,4 +104,20 @@ public class ArticlesService {
         }
         return null;
     }
+
+    public void deleteCommentFromArticle(Integer articleId, Integer commentId) {
+        var articleEntityOptional = articlesRepository.findById(articleId);
+        if(articleEntityOptional.isEmpty()){
+            throw new IllegalArgumentException("Article not found for the id");
+        }
+        var articleEntity = articleEntityOptional.get();
+        var commentList = articleEntity.getCommentEntityList();
+        var commentOptional = commentList.stream().filter(comment -> comment.getId().equals(commentId)).findFirst();
+        if(commentOptional.isEmpty()){
+            throw new IllegalArgumentException("Comment not found for the id");
+        }
+        commentList.remove(commentOptional.get());
+        articlesRepository.save(articleEntity);
+    }
+
 }

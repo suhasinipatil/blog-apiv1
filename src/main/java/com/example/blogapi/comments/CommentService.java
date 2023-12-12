@@ -22,13 +22,13 @@ public class CommentService {
     private final ModelMapper modelMapper;
     private final UserService userService;
 
-    //private final ArticlesService articlesService;
+   // private final ArticlesService articlesService;
     private final ArticlesRepository articlesRepository;
     public CommentService(CommentRepository commentRepository, ModelMapper modelMapper, UserService userService/*, ArticlesService articlesService*/, ArticlesRepository articlesRepository) {
         this.commentRepository = commentRepository;
         this.modelMapper = modelMapper;
         this.userService = userService;
-       // this.articlesService = articlesService;
+        //this.articlesService = articlesService;
         this.articlesRepository = articlesRepository;
     }
 
@@ -55,10 +55,11 @@ public class CommentService {
         return savedCommentEntity;
     }
 
-    public ResponseCommentDTO deleteComment(Integer commentId, Integer userId){
+    public ResponseCommentDTO deleteComment(Integer commentId, Integer userId, Integer articleId){
         Optional<CommentEntity> commentEntity = commentRepository.findById(commentId);
         if(commentEntity.isPresent()){
             if(commentEntity.get().getAuthor().getId() == userId){
+               // articlesService.deleteCommentFromArticle(articleId, commentId);
                 commentRepository.deleteById(commentId);
                 return modelMapper.map(commentEntity.get(), ResponseCommentDTO.class);
             }

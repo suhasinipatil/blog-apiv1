@@ -1,7 +1,6 @@
 package com.example.blogapi.comments;
 
 import com.example.blogapi.articles.ArticleEntity;
-import com.example.blogapi.articles.ArticlesRepository;
 import com.example.blogapi.articles.ArticlesService;
 import com.example.blogapi.comments.dto.CreateCommentDTO;
 import com.example.blogapi.comments.dto.ResponseCommentDTO;
@@ -12,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/articles/{articleId}/comments")
@@ -31,11 +29,6 @@ public class CommentController {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<ResponseCommentDTO>> getCommentBySlug(@PathVariable String articleSlug){
-        return ResponseEntity.ok(commentService.getAllComments(articleSlug));
-    }
-
     @PostMapping("")
     public ResponseEntity<ResponseCommentDTO> createComment(@RequestBody CreateCommentDTO createCommentDTO, @PathVariable Integer articleId, @AuthenticationPrincipal Integer userId) throws URISyntaxException {
         if(userId == null){
@@ -48,11 +41,12 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ResponseCommentDTO> deleteComment(@PathVariable Integer commentId, @AuthenticationPrincipal Integer userId, @PathVariable String articleSlug){
+    public ResponseEntity<ResponseCommentDTO> deleteComment(@PathVariable Integer commentId, @AuthenticationPrincipal Integer userId, @PathVariable Integer articleId){
         if(userId == null){
             throw new IllegalArgumentException("User not logged in");
         }
-        var deletedComment = commentService.deleteComment(commentId, userId);
+        articlesService.deleteCommentFromArticle(articleId, commentId);
+        var deletedComment = commentService.deleteComment(commentId, userId, articleId);
         return ResponseEntity.accepted().body(deletedComment);
     }
 

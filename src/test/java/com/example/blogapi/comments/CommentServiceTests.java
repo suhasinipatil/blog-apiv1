@@ -42,7 +42,7 @@ public class CommentServiceTests {
     private CommentService getCommentService(){
         if(commentService == null){
             var modelMapper = new ModelMapper();
-            commentService = new CommentService(commentRepository, modelMapper, getUserService(), articlesRepository);
+            commentService = new CommentService(commentRepository, modelMapper, getUserService(), getArticlesService(),articlesRepository);
         }
         return commentService;
     }
@@ -113,7 +113,7 @@ public class CommentServiceTests {
         UserResponseDTO userResponseDTO = createUser();
         ArticleEntity savedArticle = createArticledto(userResponseDTO.getId());
         var savedComment = getCommentService().createComment(createCommentDTO(), savedArticle, userResponseDTO.getId());
-        ResponseCommentDTO deleteComment = getCommentService().deleteComment(savedComment.getId(), userResponseDTO.getId());
+        ResponseCommentDTO deleteComment = getCommentService().deleteComment(savedComment.getId(), userResponseDTO.getId(), savedArticle.getId());
         assertNotNull(deleteComment);
 
         Optional<CommentEntity> commentEntity = commentRepository.findById(savedComment.getId());
