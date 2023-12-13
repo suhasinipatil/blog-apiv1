@@ -45,7 +45,7 @@ public class UserController {
 
     @ExceptionHandler(UserService.UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFoundException(UserService.UserNotFoundException ex){
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
     @ExceptionHandler(UserService.UserAlreadyExitsException.class)
