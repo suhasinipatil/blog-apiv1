@@ -42,7 +42,7 @@ public class CommentServiceTests {
     private CommentService getCommentService(){
         if(commentService == null){
             var modelMapper = new ModelMapper();
-            commentService = new CommentService(commentRepository, modelMapper, getUserService(), getArticlesService(),articlesRepository);
+            commentService = new CommentService(commentRepository, modelMapper, getUserService(),articlesRepository);
         }
         return commentService;
     }
@@ -86,7 +86,6 @@ public class CommentServiceTests {
     private CreateCommentDTO createCommentDTO(){
         CreateCommentDTO createCommentDTO = new CreateCommentDTO();
         createCommentDTO.setBody("cde");
-        createCommentDTO.setTitle("cde");
         return createCommentDTO;
     }
 

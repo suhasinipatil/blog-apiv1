@@ -31,6 +31,13 @@ public class UserController {
         return ResponseEntity.created(new URI("/users/" + createdUser.getId())).body(createdUser);
     }
 
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer userId, @RequestBody CreateUserDTO createUserDTO){
+        var updatedUser = userService.updateUser(userId, createUserDTO);
+        return ResponseEntity.ok(updatedUser);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<UserResponseDTO> loginUser(@RequestBody LoginUserDTO loginUserDTO,
                                                      @RequestParam(name = "token", defaultValue = "auth_token") String token)
@@ -41,6 +48,13 @@ public class UserController {
         }
         var savedUser = userService.loginUser(loginUserDTO, authType);
         return ResponseEntity.ok(savedUser);
+    }
+
+    //logout
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(@AuthenticationPrincipal Integer userId){
+        userService.logoutUser(userId);
+        return ResponseEntity.ok("User logged out");
     }
 
     @ExceptionHandler(UserService.UserNotFoundException.class)

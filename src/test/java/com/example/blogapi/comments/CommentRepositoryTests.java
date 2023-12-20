@@ -36,7 +36,6 @@ public class CommentRepositoryTests {
 
         CommentEntity commentEntity = new CommentEntity();
         commentEntity.setBody("cde");
-        commentEntity.setTitle("cde");
         commentEntity.setAuthor(userEntity);
         commentRepository.save(commentEntity);
 

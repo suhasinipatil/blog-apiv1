@@ -41,6 +41,17 @@ public class UserService {
         return userResponseDTO;
     }
 
+    public UserResponseDTO updateUser(Integer userId, CreateUserDTO createUserDTO){
+        var userEntity = findById(userId);
+        userEntity.setEmail(createUserDTO.getEmail());
+        userEntity.setUsername(createUserDTO.getUsername());
+        userEntity.setPassword(passwordEncoder.encode(createUserDTO.getPassword()));
+        userEntity.setBio(createUserDTO.getBio());
+        userEntity.setImage(createUserDTO.getImage());
+        var savedUser = userRepository.save(userEntity);
+        return modelMapper.map(savedUser, UserResponseDTO.class);
+    }
+
     public UserResponseDTO loginUser(LoginUserDTO loginUserDTO, AuthType authType){
         var userEntity = userRepository.findByUsername(loginUserDTO.getUsername());
         if(userEntity == null){
@@ -68,6 +79,14 @@ public class UserService {
         }else {
             throw new UserNotFoundException(userId);
         }
+    }
+
+    public void logoutUser(Integer userId){
+        UserEntity userEntity = findById(userId);
+        if(userEntity == null){
+            throw new UserNotFoundException(userId);
+        }
+        authTokenService.deleteAuthTokenByUserId(userId);
     }
 
     public static class UserNotFoundException extends IllegalArgumentException{

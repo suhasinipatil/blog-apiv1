@@ -32,13 +32,33 @@ public class UserServiceTests {
         return userService;
     }
 
-    @Test
-    public void createUser(){
+    public CreateUserDTO getCreateUserDTO(){
         CreateUserDTO createUserDTO = new CreateUserDTO();
         createUserDTO.setEmail("cde@gmail.com");
         createUserDTO.setUsername("cde");
         createUserDTO.setPassword("cde");
+        return createUserDTO;
+    }
+
+    @Test
+    public void createUser(){
+        CreateUserDTO createUserDTO = getCreateUserDTO();
         var savedUser = getUserService().createUser(createUserDTO);
         assertNotNull(savedUser);
+    }
+
+    @Test
+    public void updateUser(){
+        CreateUserDTO createUserDTO = getCreateUserDTO();
+        var savedUser = getUserService().createUser(createUserDTO);
+
+        CreateUserDTO updateUserDTO = new CreateUserDTO();
+        updateUserDTO.setEmail("newemail@gmail.com");
+        updateUserDTO.setUsername("newusername");
+        updateUserDTO.setPassword("newpassword");
+        updateUserDTO.setBio("newbio");
+        updateUserDTO.setImage("newimage");
+        var savedUser1 = getUserService().updateUser(savedUser.getId(), updateUserDTO);
+        assertNotNull(savedUser1);
     }
 }

@@ -7,4 +7,5 @@ import java.util.UUID;
 
 @Repository
 public interface AuthTokenRepository extends JpaRepository<AuthTokenEntity, UUID> {
+    void deleteByUser_Id(Integer userId);
 }

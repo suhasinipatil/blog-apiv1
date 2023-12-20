@@ -21,6 +21,10 @@ public class AuthTokenService {
         return savedAuthToken.getId();
     }
 
+    public void deleteAuthTokenByUserId(Integer userId){
+        authTokenRepository.deleteByUser_Id(userId);
+    }
+
     public Integer getUserIdFromAuthToken(UUID authToken){
         var savedAuthToken = authTokenRepository.findById(authToken)
                 .orElseThrow(() -> new BadCredentialsException("Invalid Auth Token"));
