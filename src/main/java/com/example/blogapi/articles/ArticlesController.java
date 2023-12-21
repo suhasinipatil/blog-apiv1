@@ -31,11 +31,13 @@ public class ArticlesController {
 
     @GetMapping("")
     public ResponseEntity<List<ResponseArticleDTO>> getArticles(){
+        System.out.println("test = ");
         return ResponseEntity.ok(articlesService.getAllArticlesWithComments());
     }
 
     @GetMapping("?authorName={authorName}")
     public ResponseEntity<List<ResponseArticleDTO>> getArticlesByAuthorName(@PathVariable String authorName){
+        System.out.println("authorName = " + authorName);
         List<ArticleEntity> articleEntities = articlesService.getArticlesByAuthorName(authorName);
         List<ResponseArticleDTO> responseArticleDTOList = new ArrayList<>();
         for(ArticleEntity article: articleEntities){
