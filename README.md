@@ -1,3 +1,43 @@
+# Blog API
+
+This is a RESTful API for a blogging platform. It's built with Java and Spring Boot.
+
+## Endpoints
+
+### Articles Controller
+
+- `GET /articles`: Returns a list of all articles.
+- `GET /articles/author?authorName={authorName}`: Returns a list of articles by the specified author.
+- `POST /articles`: Creates a new article. Requires authentication.
+- `GET /articles/{id}`: Returns the article with the specified ID.
+- `PATCH /articles/{id}`: Updates the article with the specified ID. Requires authentication.
+
+### User Controller
+
+- `POST /users`: Creates a new user.
+- `POST /users/login`: Authenticates a user and returns a token.
+- `POST /users/logout`: Logs out a user.
+
+### Comments Controller
+
+- `GET /comments`: Returns a list of all comments.
+- `POST /comments`: Creates a new comment. Requires authentication.
+- `GET /comments/{id}`: Returns the comment with the specified ID.
+- `PATCH /comments/{id}`: Updates the comment with the specified ID. Requires authentication.
+
+### Profiles Controller
+
+- `GET /profiles/{username}`: Returns the profile of the user with the specified username.
+- `POST /profiles/{username}/follow`: Follows the user with the specified username. Requires authentication.
+- `DELETE /profiles/{username}/follow`: Unfollows the user with the specified username. Requires authentication.
+
+## Running the Project
+
+To run the project, use the following command:
+
+```bash
+./gradlew bootRun
+```
 ### Postgres
 
 Enter in command line: 
