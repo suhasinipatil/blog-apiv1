@@ -16,25 +16,45 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for handling requests related to articles.
+ */
 @RestController
 @RequestMapping("/articles")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ArticlesController {
 
     private final ArticlesService articlesService;
-
     private final ModelMapper modelMapper;
+
+    /**
+     * Constructor for ArticlesController.
+     *
+     * @param articlesService the service for handling operations related to articles
+     * @param modelMapper the mapper for converting between DTOs and entities
+     */
     public ArticlesController(ArticlesService articlesService, ModelMapper modelMapper) {
         this.articlesService = articlesService;
         this.modelMapper = modelMapper;
     }
 
+    /**
+     * Endpoint for getting all articles.
+     *
+     * @return a list of all articles
+     */
     @GetMapping("")
     public ResponseEntity<List<ResponseArticleDTO>> getArticles(){
         return ResponseEntity.ok(articlesService.getAllArticlesWithComments());
     }
 
-   @GetMapping("/author")
+    /**
+     * Endpoint for getting articles by author name.
+     *
+     * @param authorName the name of the author
+     * @return a list of articles by the specified author
+     */
+    @GetMapping("/author")
     public ResponseEntity<List<ResponseArticleDTO>> getArticlesByAuthorName(@RequestParam(required = false) String authorName){
         if (authorName == null || authorName.isEmpty()) {
             return getArticles();
@@ -49,11 +69,25 @@ public class ArticlesController {
         return ResponseEntity.ok(responseArticleDTOList);
     }
 
+    /**
+     * Endpoint for getting private articles.
+     *
+     * @param userId the ID of the user
+     * @return a string message indicating the private articles for the user
+     */
     @GetMapping("/private")
     public String getPrivateArticles(@AuthenticationPrincipal Integer userId){
         return "Private Articles fetched for = " + userId;
     }
 
+    /**
+     * Endpoint for creating a new article.
+     *
+     * @param articleEntity the article to be created
+     * @param userId the ID of the user
+     * @return the created article
+     * @throws URISyntaxException if the URI syntax is incorrect
+     */
     @PostMapping("")
     public ResponseEntity<ResponseArticleDTO> createArticle(@RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId) throws URISyntaxException {
         if(userId == null){
@@ -66,6 +100,12 @@ public class ArticlesController {
         return ResponseEntity.created(new URI("/articles/" + savedArticle.getId())).body(savedResponseArticle);
     }
 
+    /**
+     * Endpoint for getting an article by slug.
+     *
+     * @param id the ID of the article
+     * @return the article with the specified ID
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ResponseArticleDTO> getArticleBySlug(@PathVariable Integer id){
         ArticleEntity article = articlesService.getArticleById(id);
@@ -82,6 +122,14 @@ public class ArticlesController {
         return ResponseEntity.ok(savedArticle);
     }
 
+    /**
+     * Endpoint for updating an article.
+     *
+     * @param id the ID of the article
+     * @param articleEntity the updated article
+     * @param userId the ID of the user
+     * @return the updated article
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseArticleDTO> updateArticle(@PathVariable Integer id, @RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId){
         if(userId == null){
@@ -91,11 +139,23 @@ public class ArticlesController {
         return ResponseEntity.ok(modelMapper.map(updatedArticle, ResponseArticleDTO.class));
     }
 
+    /**
+     * Exception handler for IllegalArgumentException.
+     *
+     * @param ex the exception
+     * @return a response entity with a bad request status and the exception message
+     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex){
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    /**
+     * Exception handler for JWTDecodeException.
+     *
+     * @param ex the exception
+     * @return a response entity with an unauthorized status and the exception message
+     */
     @ExceptionHandler(JWTDecodeException.class)
     public ResponseEntity<String> handleJWTDecodeException(JWTDecodeException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT decoding failed: " + ex.getMessage());
