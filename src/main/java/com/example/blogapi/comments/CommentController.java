@@ -35,6 +35,9 @@ public class CommentController {
             throw new IllegalArgumentException("User not logged in");
         }
         ArticleEntity article = articlesService.getArticleById(articleId);
+        if(article == null){
+            throw new IllegalArgumentException("Article not found");
+        }
         CommentEntity savedComment = commentService.createComment(createCommentDTO, article, userId);
         var responseCommentDTO = modelMapper.map(savedComment, ResponseCommentDTO.class);
         return ResponseEntity.created(new URI("/comments/" + savedComment.getId())).body(responseCommentDTO);
@@ -46,7 +49,7 @@ public class CommentController {
             throw new IllegalArgumentException("User not logged in");
         }
         articlesService.deleteCommentFromArticle(articleId, commentId);
-        var deletedComment = commentService.deleteComment(commentId, userId, articleId);
+        var deletedComment = commentService.deleteComment(commentId, userId);
         return ResponseEntity.accepted().body(deletedComment);
     }
 

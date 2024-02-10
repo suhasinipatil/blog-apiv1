@@ -22,53 +22,48 @@ public class CommentService {
     private final ModelMapper modelMapper;
     private final UserService userService;
 
-   // private final ArticlesService articlesService;
     private final ArticlesRepository articlesRepository;
-    public CommentService(CommentRepository commentRepository, ModelMapper modelMapper, UserService userService/*, ArticlesService articlesService*/, ArticlesRepository articlesRepository) {
+    public CommentService(CommentRepository commentRepository, ModelMapper modelMapper, UserService userService, ArticlesRepository articlesRepository) {
         this.commentRepository = commentRepository;
         this.modelMapper = modelMapper;
         this.userService = userService;
-        //this.articlesService = articlesService;
         this.articlesRepository = articlesRepository;
     }
 
-    public List<ResponseCommentDTO> getAllComments(String slug){
-        //ArticleEntity article = articlesService.getArticleBySlug(slug);
-        List<ResponseCommentDTO> responseCommentDTOList = new ArrayList<>();
-       /* for(CommentEntity commentEntity: article.getCommentEntityList()){
-            responseCommentDTOList.add(modelMapper.map(commentEntity, ResponseCommentDTO.class));
-        }*/
-        return responseCommentDTOList;
-    }
-
-    public CommentEntity createComment(CreateCommentDTO createCommentDTO, ArticleEntity article, Integer userId ){
-        var commentEntity = modelMapper.map(createCommentDTO, CommentEntity.class);
+    public CommentEntity createComment(CreateCommentDTO createCommentDTO, ArticleEntity article, Integer userId){
         UserEntity userEntity = userService.findById(userId);
+        if(userEntity == null){
+            throw new IllegalArgumentException("User not found");
+        }
+
+        var commentEntity = modelMapper.map(createCommentDTO, CommentEntity.class);
         commentEntity.setAuthor(userEntity);
+
         var savedCommentEntity = commentRepository.save(commentEntity);
         List<CommentEntity> commentEntityList = article.getCommentEntityList();
+
         if(commentEntityList == null)
             commentEntityList = new ArrayList<>();
+
         commentEntityList.add(savedCommentEntity);
         article.setCommentEntityList(commentEntityList);
         articlesRepository.save(article);
         return savedCommentEntity;
     }
 
-    public ResponseCommentDTO deleteComment(Integer commentId, Integer userId, Integer articleId){
+    public ResponseCommentDTO deleteComment(Integer commentId, Integer userId){
         Optional<CommentEntity> commentEntity = commentRepository.findById(commentId);
-        if(commentEntity.isPresent()){
-            if(commentEntity.get().getAuthor().getId() == userId){
-               // articlesService.deleteCommentFromArticle(articleId, commentId);
+        if(commentEntity.isEmpty()){
+            throw new IllegalArgumentException("Comment not present");
+        }
+        else{
+            if(commentEntity.get().getAuthor().getId().intValue() != userId){
+                throw new IllegalArgumentException("User not authorized to delete this comment");
+            }
+            else{
                 commentRepository.deleteById(commentId);
                 return modelMapper.map(commentEntity.get(), ResponseCommentDTO.class);
             }
-            else{
-                throw new IllegalArgumentException("User not authorized to delete this comment");
-            }
-        }
-        else{
-            throw new IllegalArgumentException("Comment not present");
         }
     }
 

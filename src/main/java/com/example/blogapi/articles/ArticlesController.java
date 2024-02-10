@@ -3,9 +3,10 @@ package com.example.blogapi.articles;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.example.blogapi.articles.dto.CreateArticleDTO;
 import com.example.blogapi.articles.dto.ResponseArticleDTO;
-import com.example.blogapi.comments.CommentEntity;
-import com.example.blogapi.comments.dto.ResponseCommentDTO;
+import com.example.blogapi.users.UserController;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,6 +28,7 @@ public class ArticlesController {
     private final ArticlesService articlesService;
     private final ModelMapper modelMapper;
 
+    private static final Logger logger = LoggerFactory.getLogger(ArticlesController.class);
     /**
      * Constructor for ArticlesController.
      *
@@ -39,45 +41,37 @@ public class ArticlesController {
     }
 
     /**
-     * Endpoint for getting all articles.
-     *
-     * @return a list of all articles
-     */
-    @GetMapping("")
-    public ResponseEntity<List<ResponseArticleDTO>> getArticles(){
-        return ResponseEntity.ok(articlesService.getAllArticlesWithComments());
-    }
-
-    /**
      * Endpoint for getting articles by author name.
      *
      * @param authorName the name of the author
      * @return a list of articles by the specified author
      */
-    @GetMapping("/author")
-    public ResponseEntity<List<ResponseArticleDTO>> getArticlesByAuthorName(@RequestParam(required = false) String authorName){
-        if (authorName == null || authorName.isEmpty()) {
-            return getArticles();
+    @GetMapping("")
+    public ResponseEntity<List<ResponseArticleDTO>> getArticles(@RequestParam(required = false) String authorName, @RequestParam(required = false) Integer id){
+        logger.info("Received request to get articles");
+        if(id != null){
+            logger.info("Received request to get article by id: {}", id);
+            ArticleEntity article = articlesService.getArticleById(id);
+            var savedArticle = modelMapper.map(article, ResponseArticleDTO.class);
+            savedArticle.setAuthor(article.getAuthor().getUsername());
+            articlesService.convertToResponseArticleDTO(article, savedArticle, modelMapper);
+            return ResponseEntity.ok(List.of(savedArticle));
         }
-        List<ArticleEntity> articleEntities = articlesService.getArticlesByAuthorName(authorName);
-        List<ResponseArticleDTO> responseArticleDTOList = new ArrayList<>();
-        for(ArticleEntity article: articleEntities){
-            ResponseArticleDTO articleDTO = modelMapper.map(article, ResponseArticleDTO.class);
-            articleDTO.setAuthor(article.getAuthor().getUsername());
-            responseArticleDTOList.add(articleDTO);
+        else if (authorName == null || authorName.isEmpty()) {
+            logger.info("Received request to get all articles");
+            return ResponseEntity.ok(articlesService.getAllArticlesWithComments());
         }
-        return ResponseEntity.ok(responseArticleDTOList);
-    }
-
-    /**
-     * Endpoint for getting private articles.
-     *
-     * @param userId the ID of the user
-     * @return a string message indicating the private articles for the user
-     */
-    @GetMapping("/private")
-    public String getPrivateArticles(@AuthenticationPrincipal Integer userId){
-        return "Private Articles fetched for = " + userId;
+        else {
+            logger.info("Received request to get articles by author: {}", authorName);
+            List<ArticleEntity> articleEntities = articlesService.getArticlesByAuthorName(authorName);
+            List<ResponseArticleDTO> responseArticleDTOList = new ArrayList<>();
+            for(ArticleEntity article : articleEntities){
+                ResponseArticleDTO articleDTO = modelMapper.map(article, ResponseArticleDTO.class);
+                articleDTO.setAuthor(article.getAuthor().getUsername());
+                responseArticleDTOList.add(articleDTO);
+            }
+            return ResponseEntity.ok(responseArticleDTOList);
+        }
     }
 
     /**
@@ -91,35 +85,15 @@ public class ArticlesController {
     @PostMapping("")
     public ResponseEntity<ResponseArticleDTO> createArticle(@RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId) throws URISyntaxException {
         if(userId == null){
+            logger.warn("User not logged in with id: {}", userId);
             throw new IllegalArgumentException("User not logged in");
         }
+        logger.info("Received request to create article");
         var savedArticle = articlesService.createArticle(articleEntity, userId);
         var savedResponseArticle = modelMapper.map(savedArticle, ResponseArticleDTO.class);
         savedResponseArticle.setAuthor(savedArticle.getAuthor().getUsername());
         savedResponseArticle.setAuthorId(savedArticle.getAuthor().getId());
         return ResponseEntity.created(new URI("/articles/" + savedArticle.getId())).body(savedResponseArticle);
-    }
-
-    /**
-     * Endpoint for getting an article by slug.
-     *
-     * @param id the ID of the article
-     * @return the article with the specified ID
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseArticleDTO> getArticleBySlug(@PathVariable Integer id){
-        ArticleEntity article = articlesService.getArticleById(id);
-        var savedArticle = modelMapper.map(article, ResponseArticleDTO.class);
-        savedArticle.setAuthor(article.getAuthor().getUsername());
-        savedArticle.setAuthorId(article.getAuthor().getId());
-
-        List<ResponseCommentDTO> responseCommentDTOList = new ArrayList<>();
-        for(CommentEntity commentEntity: article.getCommentEntityList()){
-            ResponseCommentDTO responseCommentDTO = modelMapper.map(commentEntity, ResponseCommentDTO.class);
-            responseCommentDTOList.add(responseCommentDTO);
-        }
-        savedArticle.setCommentEntities(responseCommentDTOList);
-        return ResponseEntity.ok(savedArticle);
     }
 
     /**
@@ -133,8 +107,10 @@ public class ArticlesController {
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseArticleDTO> updateArticle(@PathVariable Integer id, @RequestBody CreateArticleDTO articleEntity, @AuthenticationPrincipal Integer userId){
         if(userId == null){
+            logger.warn("User not logged in with id: {}", userId);
             throw new IllegalArgumentException("User not logged in");
         }
+        logger.info("Received request to update article with id: {}", id);
         var updatedArticle = articlesService.updateArticle(id, articleEntity, userId);
         return ResponseEntity.ok(modelMapper.map(updatedArticle, ResponseArticleDTO.class));
     }

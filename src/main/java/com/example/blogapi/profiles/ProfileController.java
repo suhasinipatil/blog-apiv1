@@ -18,13 +18,11 @@ public class ProfileController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<ProfileResponseDTO>> getProfiles(){
+    public ResponseEntity<List<ProfileResponseDTO>> getProfile(@RequestParam(required = false) String username){
+        if(username != null){
+            return ResponseEntity.ok(List.of(profileService.getProfileByUsername(username)));
+        }
         return ResponseEntity.ok(profileService.getAllProfiles());
-    }
-
-    @GetMapping("/{username}")
-    public ResponseEntity<ProfileResponseDTO> getProfileByUsername(@PathVariable String username){
-        return ResponseEntity.ok(profileService.getProfileByUsername(username));
     }
 
 }
