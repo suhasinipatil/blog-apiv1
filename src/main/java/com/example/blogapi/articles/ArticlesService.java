@@ -8,6 +8,8 @@ import com.example.blogapi.users.UserRepository;
 import org.modelmapper.Condition;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ public class ArticlesService {
 
     private final ModelMapper modelMapper;
 
+    private static final Logger logger = LoggerFactory.getLogger(ArticlesService.class);
+
     public ArticlesService(ArticlesRepository articlesRepository, UserRepository userRepository, ModelMapper modelMapper) {
         this.articlesRepository = articlesRepository;
         this.UserRepository = userRepository;
@@ -30,6 +34,7 @@ public class ArticlesService {
     }
 
     public List<ResponseArticleDTO> getAllArticlesWithComments() {
+        logger.info("Received request to get all articles");
         List<ArticleEntity> articleEntities = articlesRepository.findAll();
         // Sort the articles in descending order of creation date
         articleEntities = articleEntities.stream()
@@ -44,6 +49,7 @@ public class ArticlesService {
             convertToResponseArticleDTO(articleEntity, responseArticleDTO, modelMapper);
             articleDTOList.add(responseArticleDTO);
         }
+        logger.info("Returning all articles");
         return articleDTOList;
     }
 
@@ -58,8 +64,10 @@ public class ArticlesService {
     }
 
     public ArticleEntity createArticle(CreateArticleDTO articleEntity, Integer userId) {
+        logger.info("Received request to create article from user with id: {}", userId);
         var userEntity = UserRepository.findById(userId);
         if(userEntity.isEmpty()){
+            logger.error("User with id: {} not found", userId);
             throw new IllegalArgumentException("User not found");
         }
         var toBeSavedArticle = modelMapper.map(articleEntity, ArticleEntity.class);
@@ -68,9 +76,11 @@ public class ArticlesService {
     }
 
     public List<ArticleEntity> getArticlesByAuthorName(String authorName){
+        logger.info("Received request to get articles by author: {}", authorName);
         var userEntity = UserRepository.findByUsername(authorName);
         Optional<List<ArticleEntity>> lsOfArticleEntity = articlesRepository.findByAuthorId(userEntity.getId());
         if(lsOfArticleEntity.isEmpty()){
+            logger.error("No Articles found");
             throw new IllegalArgumentException("No Articles found");
         }
         else{
@@ -79,8 +89,10 @@ public class ArticlesService {
     }
 
     public ArticleEntity getArticleById(Integer id){
+        logger.info("Received request to get article by id: {}", id);
         var articleEntity = articlesRepository.findById(id);
         if(articleEntity.isEmpty()){
+            logger.error("Article not found for the id: {}", id);
             throw new IllegalArgumentException("Article not found for the id");
         }
         else{
@@ -89,15 +101,19 @@ public class ArticlesService {
     }
 
     public ArticleEntity updateArticle(Integer id, CreateArticleDTO articleEntity, Integer userId){
+        logger.info("Received request to update article by id: {}", id);
         var savedArticle = articlesRepository.findById(id);
         if(savedArticle.isEmpty()){
+            logger.error("Article not found for the id: {}", id);
             throw new IllegalArgumentException("Article not found for the id");
         }
         else{
             if(userId != savedArticle.get().getAuthor().getId().intValue()){
+                logger.error("User not authorized to update this article");
                 throw new IllegalArgumentException("User not authorized to update this article");
             }
             else {
+                logger.info("Updating article with id: {}", id);
                 var article = savedArticle.get();
                 Condition notNull = context -> context.getSource() != null;
                 modelMapper.getConfiguration().setPropertyCondition(notNull);

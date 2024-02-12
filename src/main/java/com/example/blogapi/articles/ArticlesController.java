@@ -93,6 +93,7 @@ public class ArticlesController {
         var savedResponseArticle = modelMapper.map(savedArticle, ResponseArticleDTO.class);
         savedResponseArticle.setAuthor(savedArticle.getAuthor().getUsername());
         savedResponseArticle.setAuthorId(savedArticle.getAuthor().getId());
+        logger.info("Article created with id: {}", savedArticle.getId());
         return ResponseEntity.created(new URI("/articles/" + savedArticle.getId())).body(savedResponseArticle);
     }
 
@@ -112,6 +113,7 @@ public class ArticlesController {
         }
         logger.info("Received request to update article with id: {}", id);
         var updatedArticle = articlesService.updateArticle(id, articleEntity, userId);
+        logger.info("Article with id: {} updated", id);
         return ResponseEntity.ok(modelMapper.map(updatedArticle, ResponseArticleDTO.class));
     }
 
